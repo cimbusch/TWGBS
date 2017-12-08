@@ -17,12 +17,12 @@ import argparse
 parser = argparse.ArgumentParser(description='Alignment-free program to reconstruct correct R1-R2 reads relation from T/C and A/G base ratio in TWGBS data.')
 parser.add_argument('--R1_in', help='R1 input file', required=True)
 parser.add_argument('--R2_in', help='R2 input file', required=True)
-parser.add_argument('--gzip_input', help='Set if input fastq files are compressed', action='store_true', required=False, default=False)
+parser.add_argument('--input_ascii', help='Set if input fastq files are *not* compressed', action='store_true', required=False, default=False)
 parser.add_argument('--R1_out', help='R1 output file', required=True)
 parser.add_argument('--R2_out', help='R2 output file', required=True)
 parser.add_argument('--R1_unassigned', help='Filename R1 for unassigned read pairs', required=True)
 parser.add_argument('--R2_unassigned', help='Filename R2 for unassigned read pairs', required=True)
-parser.add_argument('--gzip_output', help='Set if output fastq files should be compressed', action='store_true', required=False, default=False)
+parser.add_argument('--output_ascii', help='Set if output fastq files should be *not* compressed', action='store_true', required=False, default=False)
 parser.add_argument('--log', help='Write basic statistics to this file', required=False, default=False)
 parser.add_argument('--debug', help='Debug and write more output to console', action='store_true', required=False, default=False)
 
@@ -41,15 +41,15 @@ R1_unassigned = None
 R2_unassigned = None
 
 # file handlers for input files
-if args_dict['gzip_input'] == True:
-    f = open(args_dict['R1_in'], 'r')
-    f2 = open(args_dict['R2_in'], 'r')
-else:
+if args_dict['input_ascii'] == False:
     f = gzip.open(args_dict['R1_in'], 'r')
     f2 = gzip.open(args_dict['R2_in'], 'r')
+else:
+    f = open(args_dict['R1_in'], 'r')
+    f2 = open(args_dict['R2_in'], 'r')
 
 # file handlers for output files
-if args_dict['gzip_output'] == True:
+if args_dict['output_ascii'] == False:
     f_R1_out = gzip.open(args_dict['R1_out'], 'wb')
     f_R2_out = gzip.open(args_dict['R2_out'], 'wb')
     R1_unassigned = gzip.open(args_dict['R1_unassigned'], 'wb')
