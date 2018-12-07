@@ -70,22 +70,11 @@ num_unsure = 0
 
 ### count A/T/C/G content in a given sequence
 def getContent(DNAsequence):
-    A = 0
-    T = 0
-    C = 0
-    G = 0
-    N = 0
-    for c in DNAsequence:
-        if c == 'A':
-            A+=1
-        if c == 'T':
-            T+=1
-        if c == 'C':
-            C+=1
-        if c == 'G':
-            G+=1
-        if c == 'N':
-            N+=1
+    A = DNAsequence.count("A")
+    T = DNAsequence.count("T")
+    C = DNAsequence.count("C")
+    G = DNAsequence.count("G")
+    N = DNAsequence.count("N")
     return (A, T, C, G, N)
 
 ### count base content masking CG/TG content
