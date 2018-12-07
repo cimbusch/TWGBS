@@ -6,7 +6,7 @@ in an alignment-free way.
 
 ## Script execution
 
-To execute the python script Python 3.x is required. The script requires to specify R1 and R2 fastq files (gzip or fastq are both accepted) as well as
+To execute the python script Python 2.7 is required. The script requires to specify R1 and R2 fastq files (gzip or fastq are both accepted) as well as
 the output fastq files for R1 and R2 (gzip or fastq) and fastq filenames for the unassgined R1 and R2 reads.
 
 ```
