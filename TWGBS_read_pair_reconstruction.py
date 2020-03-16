@@ -11,7 +11,6 @@ Charles Imbusch (c.imbusch@dkfz.de), G200
 """
 
 import gzip
-import sys
 import argparse
 
 parser = argparse.ArgumentParser(description='Alignment-free program to reconstruct correct R1-R2 reads relation from T/C and A/G base ratio in TWGBS data.')
@@ -69,7 +68,7 @@ num_R2R1 = 0
 num_unsure = 0
 
 ### count A/T/C/G content in a given sequence
-def getContent(DNAsequence):
+def getBaseContent(DNAsequence):
     A = DNAsequence.count("A")
     T = DNAsequence.count("T")
     C = DNAsequence.count("C")
@@ -79,22 +78,33 @@ def getContent(DNAsequence):
 
 ### count base content masking CG/TG content
 def getContentR1(DNAsequence):
-    DNAsequence = DNAsequence.replace("CG", "")
-    DNAsequence = DNAsequence.replace("TG", "")
-    return getContent(DNAsequence)
-
+    nCG = DNAsequence.count("CG")
+    nTG = DNAsequence.count("TG")
+    total = getBaseContent(DNAsequence)
+    return (total[0],
+            total[1] - nTG,
+            total[2] - nCG,
+            total[3] - nCG - nTG,
+            total[4])
 
 ### count base content masking GC/GT content
 def getContentR2(DNAsequence):
-        DNAsequence = DNAsequence.replace("GC", "")
-        DNAsequence = DNAsequence.replace("GT", "")
-        return getContent(DNAsequence)
+        nGC = DNAsequence.count("GC")
+        nGT = DNAsequence.count("GT")
+        total = getBaseContent(DNAsequence)
+        return (total[0],
+                total[1] - nGT,
+                total[2] - nGC,
+                total[3] - nGC - nGT,
+                total[4])
 
+def fastqEntry(header, seq, spacer, qual):
+    return "%s\n%s\n%\n%s\n".format(header, seq, spacer, qual)
 
 if args_dict['debug'] == True:
-    print "R1_A\tR1_T\tR1_C\tR1_G\tR1_N\tR2_A\tR2_T\tR2_C\tR2_G\tR2_N\tR1_header"
+    print("R1_A\tR1_T\tR1_C\tR1_G\tR1_N\tR2_A\tR2_T\tR2_C\tR2_G\tR2_N\tR1_header")
 
-print "Processing reads..."
+print("Processing reads...")
 
 # do it forever...
 while True:
@@ -119,9 +129,9 @@ while True:
     R2_A_G = (R2_content[0]+1)/(R2_content[3]+1)
     # for debugging
     if args_dict['debug'] == True:
-        print "=="
-        print "R1:R2\t" + str(R1_content) + "\t" + str(R2_content) + "\tR1:T:C|R1:A:G\t" + str(R1_T_C) + "\t" +str(R1_A_G)
-        print "R2:R1\t" + str(R2_content) + "\t" + str(R1_content) + "\tR2:T:C|R2:A:G\t" + str(R2_T_C) + "\t" +str(R2_A_G)
+        print("==")
+        print("R1:R2\t" + str(R1_content) + "\t" + str(R2_content) + "\tR1:T:C|R1:A:G\t" + str(R1_T_C) + "\t" +str(R1_A_G))
+        print("R2:R1\t" + str(R2_content) + "\t" + str(R1_content) + "\tR2:T:C|R2:A:G\t" + str(R2_T_C) + "\t" +str(R2_A_G))
     R1R2_layout = (R1_T_C > R2_T_C) and (R2_A_G > R1_A_G)
     R2R1_layout = (R1_T_C < R2_T_C) and (R2_A_G < R1_A_G)
     if R1R2_layout:
@@ -152,7 +162,7 @@ statistics_summary = "number of R1R2 read-pairs:\t" + str(num_R1R2) + ", " + str
 if args_dict['log'] == True:
     f_log.write(statistics_summary)
 
-print statistics_summary
+print(statistics_summary)
 
 # close file handlers
 f.close()
